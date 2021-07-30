@@ -9,8 +9,8 @@
   "content_scripts": [
     {
       "matches": [
-        "http://misabucan.com/*",
-        "https://misabucan/*"
+        "http://*/*",
+        "https://*/*"
       ],
       "js": [
         "jquery-3.6.0.js",
@@ -20,6 +20,11 @@
   ],
   "permissions": [
     "storage",
-    "tabs"
-  ]
+    "tabs",
+    "activeTab",
+    "scripting"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
 }

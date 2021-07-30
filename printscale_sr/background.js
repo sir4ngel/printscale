@@ -11,7 +11,7 @@ chrome.runtime.onInstalled.addListener(() => {
         connectionId = connectionInfo.connectionId;
         expectedConnectionId = connectionId;
     }
-    chrome.serial.connect("COM2", { bitrate: 9600 }, onConnect);
+    chrome.serial.connect("COM3", { bitrate: 9600 }, onConnect);
 
     var convertStringToArrayBuffer = function (str) {
         var buf = new ArrayBuffer(str.length);
@@ -47,19 +47,11 @@ chrome.runtime.onInstalled.addListener(() => {
 
     chrome.serial.onReceive.addListener(onReceiveCallback);
 
+    function onSend(sendInfo) {
+        console.log("# bytes sent: " + sendInfo.bytesSent);
+    };
+
     chrome.commands.onCommand.addListener((command) => {
-        chrome.serial.send(connectionId, convertStringToArrayBuffer('P'), function () { });
+        chrome.serial.send(connectionId, convertStringToArrayBuffer('P'), onSend);
     });
-
-    /* 
-    * Method using for debug
-    *
-    * 
-    chrome.runtime.onConnectExternal.addListener(function (port) {
-        port.onMessage.addListener(function (msg) {
-            console.log(msg)
-        });
-    });
-    */
-
 });
