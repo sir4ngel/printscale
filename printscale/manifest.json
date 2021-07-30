@@ -1,0 +1,25 @@
+{
+  "name": "PrintScale",
+  "description": "Print the data from scale to DOM",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://misabucan.com/*",
+        "https://misabucan/*"
+      ],
+      "js": [
+        "jquery-3.6.0.js",
+        "script.js"
+      ]
+    }
+  ],
+  "permissions": [
+    "storage",
+    "tabs"
+  ]
+}

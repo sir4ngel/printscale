@@ -1,0 +1,33 @@
+{
+  "name": "PrintScale-SR",
+  "description": "PrintScale serial-port backend.",
+  "version": "1.0",
+  "manifest_version": 2,
+  "app": {
+    "background": {
+      "scripts": [
+        "background.js"
+      ]
+    }
+  },
+  "commands": {
+    "run-foo": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Send the data to the client"
+    },
+    "_execute_action": {
+      "suggested_key": {
+        "windows": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y",
+        "chromeos": "Ctrl+Shift+U",
+        "linux": "Ctrl+Shift+J"
+      }
+    }
+  },
+  "permissions": [
+    "serial"
+  ]
+}
