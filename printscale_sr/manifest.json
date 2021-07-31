@@ -6,7 +6,8 @@
   "description": "PrintScale serial-port backend.",
   "app": {
     "background": {
-      "scripts": [ "background.js" ]
+      "scripts": [ "background.js" ],
+      "persistent": "true"
     }
   },
   "commands": {

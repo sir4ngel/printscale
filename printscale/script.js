@@ -1,10 +1,12 @@
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
-        if (request) {
-            insertDataToInput(request);
+        if (request.status == 'WEIGHT') {
+            var weight = request.weight.replaceAll(/[A-z]+/g, "");
+            weight = weight.replace(/\s/g, '');
+            insertDataToInput(weight);
         }
     });
 
-function insertDataToInput(data) {
-    document.activeElement.value = data;
+function insertDataToInput(weight) {
+    document.activeElement.value = weight;
 }
