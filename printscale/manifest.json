@@ -13,7 +13,6 @@
         "https://*/*"
       ],
       "js": [
-        "jquery-3.6.0.js",
         "script.js"
       ]
     }
@@ -25,6 +24,12 @@
     "scripting"
   ],
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "/images/bascula.png",
+      "32": "/images/bascula.png",
+      "48": "/images/bascula.png",
+      "128": "/images/bascula.png"
+    }
   }
 }
