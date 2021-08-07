@@ -3,32 +3,36 @@ var devices = {
     "devices": [
     ]
 };
-var clientId = 'gpgkioeamhemcebkdojbelpmbmnohclo';
 
 var onGetDevices = function (ports) {
     try {
         if (ports.length === 0) {
-            devices.status = 'RELOAD-EMPTY';
+            devices.status = 'DEVICES-EMPTY';
             devices.devices = new Array(0);
             console.log(devices);
         } else {
             for (var i = 0; i < ports.length; i++) {
                 devices.devices[i] = { displayName: ports[i].displayName, path: ports[i].path };
             }
-            devices.status = 'RELOAD';
+            devices.status = 'DEVICES';
             console.log(devices);
         }
     } catch (error) {
         console.log("Error al obtener datos de puertos seriales: " + error);
     }
-    
+
 }
 
 var onConnect = function (connectionInfo) {
     try {
-        connectionId = connectionInfo.connectionId;
-        expectedConnectionId = connectionId;
-        console.log('Connected to: ' + connectionId)
+        if(typeof connectionId == 'undefined') {
+            connectionId = connectionInfo.connectionId;
+            expectedConnectionId = connectionId;
+            console.log('Connected to: ' + connectionId)
+        } else {
+            console.log('ConnectionId already exists: ' + connectionId)
+        }
+        
     } catch (error) {
         console.log("Error al tratar de conectar a bascula: " + error);
     }
@@ -50,15 +54,11 @@ function convertArrayBufferToString(buf) {
     return decodeURIComponent(encodedString);
 }
 
-function sendAvailableDevices() {
-    try {
-        chrome.serial.getDevices(onGetDevices);
-    var port = chrome.runtime.connect(clientId);
-    port.postMessage(devices);
-    } catch (error) {
-        console.log("Error al enviar datos de bascula al cliente: " + error);
-    }
-    
+function successfullyConnected(msg) {
+    chrome.storage.local.set({ clientId: msg.clientId }, function () {
+    });
+    var port = chrome.runtime.connect(msg.clientId);
+    port.postMessage({ status: 'SUCCESS' });
 }
 
 function tryToConnectDevice(port) {
@@ -67,7 +67,25 @@ function tryToConnectDevice(port) {
     } catch (error) {
         console.log("Error al tratar de conectar a bascula: " + error);
     }
-    
+}
+
+function printData() {
+    try {
+        chrome.serial.getDevices(onGetDevices);
+        console.log(devices.devices[0].path);
+        if(typeof connectionId == 'undefined') {
+            tryToConnectDevice(devices.devices[0].path)
+        } else {
+            console.log('ConnectionId already exists: ' + connectionId)
+        }
+        try {
+            chrome.serial.send(connectionId, convertStringToArrayBuffer('P'), onSend);
+        } catch (error) {
+            console.log('Error al enviar datos a la bascula: ' + error);
+        }
+    } catch (error) {
+        console.log('Error obteniendo devices: ' + error);
+    }
 }
 
 var stringReceived = '';
@@ -80,9 +98,15 @@ var onReceiveCallback = function (info) {
             stringReceived = '';
         } else {
             stringReceived += str;
-            var port = chrome.runtime.connect(clientId);
-            port.postMessage({status: 'WEIGHT', weight: stringReceived});
-            stringReceived = '';
+            try {
+                chrome.storage.local.get(['clientId'], function (result) {
+                        var port = chrome.runtime.connect(result.clientId);
+                        port.postMessage({ status: 'WEIGHT', weight: stringReceived });
+                    stringReceived = '';
+                });
+            } catch (error) {
+                console.log(error)
+            }
         }
     }
 };
@@ -90,25 +114,21 @@ var onReceiveCallback = function (info) {
 chrome.serial.onReceive.addListener(onReceiveCallback);
 
 function onSend(sendInfo) {
-    console.log("# bytes sent: " + sendInfo.bytesSent);
+    console.log('Datos enviados con exito a la bascula' + sendInfo);
 };
 
 chrome.commands.onCommand.addListener((command) => {
     try {
-        chrome.serial.send(connectionId, convertStringToArrayBuffer('P'), onSend);
+        printData();
     } catch (error) {
         console.log("Error enviando datos al puerto serial: " + error);
     }
-
 });
 
 chrome.runtime.onConnectExternal.addListener(function (port) {
     port.onMessage.addListener(function (msg) {
-        if (msg.status == 'RELOAD') {
-            sendAvailableDevices();
-        }
-        if (msg.status == 'CONNECT') {
-            tryToConnectDevice(msg.value);
+        if (msg.status == 'SERVERID') {
+            successfullyConnected(msg);
         }
     });
 });

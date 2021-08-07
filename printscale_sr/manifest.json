@@ -6,28 +6,28 @@
   "description": "PrintScale serial-port backend.",
   "app": {
     "background": {
-      "scripts": [ "background.js" ],
-      "persistent": "true"
+      "scripts": [ "background.js" ]
     }
   },
   "commands": {
     "run-foo": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Y",
-        "mac": "Command+Shift+Y"
+        "default": "Ctrl+Shift+K",
+        "mac": "Command+Shift+K"
       },
       "description": "Run \"foo\" on the current page."
     },
     "_execute_action": {
       "suggested_key": {
-        "windows": "Ctrl+Shift+Y",
-        "mac": "Command+Shift+Y",
-        "chromeos": "Ctrl+Shift+U",
-        "linux": "Ctrl+Shift+J"
+        "windows": "Ctrl+Shift+K",
+        "mac": "Command+Shift+K",
+        "chromeos": "Ctrl+Shift+K",
+        "linux": "Ctrl+Shift+K"
       }
     }
   },
   "permissions": [
-    "serial"
+    "serial",
+    "storage"
   ]
 }
